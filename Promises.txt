@@ -1,0 +1,106 @@
+What?
+A Promise is an object that represents the eventual completion or failure of an asynchronous operation and its resulting value.
+A promise can have 3 states pending, resolved or rejected
+Why?
+A Promise is required in JavaScript mainly to handle asynchronous operations cleanly. It tells the JS Engine that the value is not available right now but whenever it is available what you should do.
+Ways of creating a promise?
+// 1. Create
+const newPromise = new Promise((resolve, reject) => {});
+
+// 2. Resolve an existing value
+Promise.resolve(value); => returns a Promise 
+
+// 3. async function
+async function test() {
+  return value; => Will wrap the value in a promise object
+}
+
+Supported Methods?
+1. promise.then()
+then() is used to handle a successful/fulfilled promise. It takes a callback function that is executed once the Promise is fullfilled
+.then() method returns a Promise therefore it can be used for Promise chaining.
+Promise.resolve(10)
+  .then(value => {
+    return value * 2;
+  })
+  .then(value => {
+    console.log(value);
+  });
+2. promise.catch()
+.catch() handles a rejected promise.
+catch() returns a new Promise. If the catch handler returns a value, the new Promise is fulfilled with that value. If it throws an error or returns a rejected Promise, the new Promise is rejected.
+The error moves down the Promise chain until it finds a rejection handler.
+Promise.resolve()
+  .then(() => {
+    console.log("then 1");
+    throw new Error("Something went wrong");
+  })
+  .then(() => {
+    console.log("then 2");
+  })
+  .catch(error => {
+    console.log("catch");
+  });
+
+Promise.resolve()
+      ↓
+   then 1
+      ↓
+   ❌ throw error
+      ↓
+   then 2  ← SKIPPED
+      ↓
+   catch   ← executes
+Promise.resolve()
+  .then(() => {
+    console.log("then 1");
+    throw new Error("Error");
+  })
+  .catch(() => {
+    console.log("catch");
+  })
+  .then(() => {
+    console.log("then 2");
+  });
+then 1
+  ↓
+❌ error
+  ↓
+catch
+  ↓
+✅ recovered
+  ↓
+then 2
+3. promise.finally()
+.finally() executes regardless of whether the Promise succeeds or fails
+There is no fixed then → catch → finally ordering. The chain you construct determines the order, while Promise fulfillment/rejection determines which handlers are actually invoked.
+This means that finally can also decide whether a Promise should be resolved or rejected
+Promise Chaining and Promise.all()?
+If the order of execution of promise is important then we use Promise chaining using .then() method but if the order of execution is not important we can club multiple promises using Promise.all()
+const p1 = Promise.resolve("A");
+const p2 = Promise.resolve("B");
+const p3 = Promise.resolve("C");
+
+Promise.all([p1, p2, p3])
+  .then(results => {
+    console.log(results);
+  });
+Notes: 
+Promise.all() returns a promise so it can be chained
+Promise.all() is fulfilled if all are fulfilled, if even one is rejected Promise.all() is rejected
+Promise.all() maintains the order of Promises and returns the result in same order
+
+Other Promise methods
+* Promise.allSettled(): Waits for all Promise to  settle whether fulfilled or rejected and returns the result of each Promise
+* Promise.race(): Returns the first settled promise no matter fulfilled or rejected
+* Promise.any(): Returns the first fulfilled promise. Returns error if no promise is fulfilled
+
+Pros and Cons?
+Pros:
+Avoid Callback hell
+Good error propogation and cleaner async code
+Supports Chaining and parallel execution both
+Cons:
+Long chains can become complex
+Returns a single value once and not a stream of data
+Is not cancellable once created
