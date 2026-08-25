@@ -27,20 +27,47 @@ const user = {
 
 const { name, age, city } = user;
 Object Methods Adding/modifying/deleting properties?
-For adding- 
+*For adding- 
 1. user.age = 30; 
 2 let prop = age;
   user[prop] = 30;
-For modifying-
+
+*For modifying-
 user.age = 29; => If the property exists it will modify it or else create a new one
-For deleting-
+
+*For deleting-
 delete user.age => deletes the property and not the Parent object
+
 * IN Operator
-in operator is used to check whether a property exists in the given object
+in operator is used to check whether a property exists in the given object or its prototype
 console.log("age" in user);
 => in also checks inherited properties.
+
 * hasOwn()
-Object.hasOwn(user,"age")
+Object.hasOwn(user,"age");
+Checks whether a property exists directly on the object.It does not look through the prototype chain.
+
+*hasOwnProperty()
+user.hasOwnProperty("age");
+checks whether a property exists in an object. hasOwnProperty() itself can be overridden or unavailable.
+
+*Object.keys() => Return all the own keys of an object
+
+*Object.values() => Return the value of own keys.
+
+* Object.entries() => Returns array where each element is an array of form [key, value]
+
+* Object.fromEntries() => Convert [key,value] array to object
+
+*Object.assign(target,source) => Copies properties from source object to target object. Performs shallow copy returns an object that can be stored in a variable
+
+* Object.create(prototype) => Create a new project from prototype. The new object will not have its own property unless created. It will return the properties of prototype. Nested properties are shared between the new object and the prototype
+
+* Object.freeze() => Makes object non modifiable at the top level. Nested properties can still be changed
+
+* Object.seal() => Values can be modified but not added.
+
+
 Object Prototype, Prototype chain Prototype Inheritance
 __proto__ vs prototype
 
