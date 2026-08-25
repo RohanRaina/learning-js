@@ -69,5 +69,14 @@ checks whether a property exists in an object. hasOwnProperty() itself can be ov
 
 
 Object Prototype, Prototype chain Prototype Inheritance
+A prototype is an object from which another object can inherit properties and methods. JavaScript uses prototypes to implement inheritance.
+When you try to access a property on an object, JavaScript first looks at the object itself.
+If it doesn't find it, JavaScript looks at the object's prototype.
+If it still doesn't find it, JavaScript continues looking at the prototype's prototype. This continues until it reaches null.
+That's called the Prototype Chain.
 __proto__ vs prototype
-
+Prototype represents the object from which an instance may inherit whereas __proto__ is used to get the parent object prototype from which the Object inherits
+Each JS Object or function inherits from Object.prototype. That means Object.prototype sits at the top of Prototype Chain
+Object.getPrototypeOf() is now used instead of __proto__
+What is property shadowing?
+Property shadowing occurs when a child object has a property with the same name as a property in its prototype. When accessing that property through the child, JavaScript finds the child's own property first, so the prototype's property is shadowed.
