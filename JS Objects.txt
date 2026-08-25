@@ -1,0 +1,46 @@
+Shallow Copy vs Deep Copy
+A shallow copy creates a new top-level object but keeps references to nested objects, so modifying a nested object can affect the original. A deep copy recursively creates independent copies of nested objects, so changes to the copy don't affect the original.
+const original = {
+  name: "Alice",
+  address: {
+    city: "Hyderabad"
+  }
+};
+
+const shallow = { ...original };
+const deep = structuredClone(original);
+
+shallow.address.city = "Delhi";
+
+console.log(original.address.city); // Delhi
+
+deep.address.city = "Mumbai";
+
+console.log(original.address.city); // Delhi
+Object De-structuring?
+Object destructuring is a JavaScript syntax that lets you extract properties from an object and store them in variables easily.
+const user = {
+  name: "Alice",
+  age: 25,
+  city: "Hyderabad"
+};
+
+const { name, age, city } = user;
+Object Methods Adding/modifying/deleting properties?
+For adding- 
+1. user.age = 30; 
+2 let prop = age;
+  user[prop] = 30;
+For modifying-
+user.age = 29; => If the property exists it will modify it or else create a new one
+For deleting-
+delete user.age => deletes the property and not the Parent object
+* IN Operator
+in operator is used to check whether a property exists in the given object
+console.log("age" in user);
+=> in also checks inherited properties.
+* hasOwn()
+Object.hasOwn(user,"age")
+Object Prototype, Prototype chain Prototype Inheritance
+__proto__ vs prototype
+
