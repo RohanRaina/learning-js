@@ -1,0 +1,27 @@
+Operators and Functions
+
+1. arr.push()
+=> Adds element at the end of the array and return the new length of the array. Mutates the original array
+2. arr.pop()
+=> Removes the last element of the array and return it. Mutates the original array
+3. arr.shift()
+=> Removes the first element of the array and returns the removed element.Takes more time than pop
+as first element is removed and rest elements are shifted to the begining.
+4. arr.unshift()
+=>unshift() adds one or more elements to the beginning of an array and returns the new length. It also mutatates the original array
+It adds the elements in the order you pass them.
+5. arr.slice(start, end)
+=> slice() is used to extract a portion of an array without modifying the original array.Start index is is included but end is not
+=> If just one argument is provided like slice(2), it means start from 2nd index and go till the end (end is included)
+=> If no arg is provided like slice(), entire array is sliced to a new array. This way is used to make shallow copies of the array
+=> Array indexex starts from 0 and goes from start to end. But it can be represent from end to start using negative indexes
+where end is represented by -1 and the other element like -2 -3 so on till the start
+so slice(-2) means slice the array from second last element to the end
+6. arr.splice()
+splice() is used to add, remove, or replace elements in an array.
+array.splice(start, deleteCount, item1, item2, ...)
+deleteCount = 0  → ADD
+deleteCount > 0  → REMOVE
+deleteCount > 0 + new items → REPLACE
+splice() returns an array containing the removed elements.
+Modification Problems
