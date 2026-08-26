@@ -24,4 +24,105 @@ deleteCount = 0  → ADD
 deleteCount > 0  → REMOVE
 deleteCount > 0 + new items → REPLACE
 splice() returns an array containing the removed elements.
+7. arr.concat()
+concat() is used to combine arrays or values and return a new array.
+=> Concate also creates a shallow copy
+8. indexOf()
+indexOf() searches for a value in an array and returns its first index.
+indexOf() returns -1 when the element isn't found.
+*indexOf(searchElement, fromIndex) You can also specify from which index search should start
+9 lastIndexOf()
+It is similar to indexOf(), but it searches from the end of the array and returns the last occurrence of a value.
+array.lastIndexOf(searchElement, fromIndex) The search will start from fromIndex and go from right to left
+10. includes()
+includes() checks whether an array contains a particular value.
+array.includes(value, fromIndex) It can also take starting index as argument
+includes() can correctly detect NaN, whereas indexOf() does not.
+const arr = [1, 2, NaN];
+
+console.log(arr.includes(NaN));
+// true
+
+console.log(arr.indexOf(NaN));
+// -1
+11. find()
+find() returns the first element that satisfies a condition.
+if nothing matches it returns undefined
+12. findIndex()
+findIndex() → returns the index of the matching element
+if nothing matches it returns -1
+13. some()
+it checks whether at least one element in the array satisfies a condition.
+it returns a boolean value.
+empty array will return false since there is no element that satisfy the condition
+14. every() 
+it checks whether ALL elements satisfy a condition.
+For empty array every() returns true since there is no element that violates the condition.
+15. filter() 
+it creates a new array containing all elements that satisfy a condition.
+filter() returns an empty array, not undefined if nothing matches
+16. map()
+map() transforms every element and returns a new array.
+17 forEach()
+forEach() executes a function once for each element in the array.
+The forEach() method itself does not modify the array.But you can modify the array inside the callback.
+18 reduce()
+reduce() processes all array elements and accumulates them into a single final value.
+const nums = [10, 20, 30, 40];
+intialVlaue = 0
+const sum = nums.reduce((acc, current) => {
+  return acc + current;
+}, initialValue);
+
+console.log(sum);
+// 100
+acc     → accumulator
+current → current array element
+initialValue -> Initial value of the accumulator
+The accumulator carries the result from one iteration to the next.
+If the initial value is not provide reduce takes the first element as acc and starts from 2nd value.
+
+19 sort()
+sort() converts elements to strings and sorts them lexicographically (dictionary-style).
+const arr = [10, 2, 30, 5];
+
+arr.sort();
+
+console.log(arr);//[10, 2, 30, 5]
+"10" → starts with "1"
+"2"  → starts with "2"
+"30" → starts with "3"
+"5"  → starts with "5"
+For numeric sorting use comparator functions inside sort()
+arr.sort((a, b) => a - b);
+
+JavaScript uses the returned number to decide the order of a and b.
+
+The rule
+negative → a comes BEFORE b
+positive → a comes AFTER b
+zero     → keep their relative order
+sort() mutates the original array
+
+20. reverse()
+reverse() reverses the order of elements in place.
+It also mutates the original array
+
+21. join() 
+converts the elements of an array into a string, with a separator between them.
+join() does not mutate the original array.
+
+22. flat() is used to remove nested array levels.
+It removes one level of nesting by default. but you can mention the level as arg like arr.flat(2).
+arr.flat(infinity) will flatten all the nested elements
+returns a new array and not mutate the original one
+
+23. flatMap() 
+combines map() + flat(1) into one operation.
+
+24 at() 
+lets you access an element by its index.
+Negative index means at starts looking form right to left.
+If index is out of bounds then at returns undefined
+
 Modification Problems
