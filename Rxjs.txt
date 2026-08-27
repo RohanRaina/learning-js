@@ -1,0 +1,152 @@
+What is Rxjs?
+
+RxJS stands for Reactive Extensions for JavaScript.RxJS is a library for reactive programming in JavaScript. It provides Observables and operators to work with asynchronous and event-based data streams.
+For example, these are all things that can produce values over time:
+
+HTTP responses
+User clicks
+Keyboard events
+Timers
+WebSocket messages
+Form value changes
+RxJS gives us tools to create, transform, combine, filter, and react to these streams of values.
+
+What is an Observable?
+An Observable represents a stream of values over time.
+It can emit zero, one, or multiple values, and consumers receive those values by subscribing to the Observable.
+const observable$ = new Observable(subscriber => {
+  subscriber.next(10);
+  subscriber.next(20);
+});
+
+observable$.subscribe(value => {
+  console.log(value);
+});
+
+Here:
+Observable → producer
+subscriber.next() → sends a value
+subscribe() → starts listening
+callback → consumes the value
+
+Ways to create an Observable
+Function	Used for
+of()	Create Observable from values
+from()	Convert an existing source such as an array or Promise into an Observable
+fromEvent()	Create Observable from events
+interval()	Emit numbers repeatedly at fixed intervals
+timer()	Emit after a delay, optionally repeatedly
+new Observable()	Manually create an Observable
+
+of() emits what you give it. from() emits the contents of what you give it (when the input is a supported iterable/Promise/etc.).
+
+subscribe() is used to listen to the values emitted by an Observable.
+When we subscribe, we can handle:
+next → receives emitted values
+error → handles an error
+complete → runs when the Observable finishes successfully
+Example:
+observable$.subscribe({
+  next: value => console.log(value),
+  error: error => console.log(error),
+  complete: () => console.log('Finished')
+});
+Observables are generally lazy. Creating an Observable does not normally execute its work. The work begins when we subscribe to it.
+A cold Observable is an Observable where:
+Each subscriber gets its own independent execution of the Observable.
+
+A hot Observable has a shared or independently running source, so multiple subscribers can receive values from the same ongoing execution.
+The easiest mental model
+Cold
+Subscriber 1 → [new execution]
+Subscriber 2 → [new execution]
+Subscriber 3 → [new execution]
+
+Hot
+                [one ongoing source]
+                 /       |       \
+                /        |        \
+        Subscriber 1  Subscriber 2  Subscriber 3
+unsubscribe()
+unsubscribe() stops a subscription from receiving further values and performs the subscription's teardown/cleanup.
+complete() vs unsubscribe()
+complete() is a notification from the Observable that it has finished.
+
+unsubscribe() is an action used to stop a subscription.
+
+Subject
+A Subject is a special RxJS type that can act as both an Observable and an Observer.
+As an Observable
+You can do:
+
+subject.subscribe(...)
+
+So it can have subscribers.
+
+As an Observer
+You can do:
+
+subject.next(10);
+subject.error(...);
+subject.complete();
+
+So it can receive/send notifications.
+A Subject can send the same emitted value to multiple current subscribers.
+Subjects don't replay old values. Each subscriber will get only those values that the Subject emitted after subscriber subscribed to it
+
+BehaviorSubject
+A BehaviorSubject is like a Subject, but it has one important additional feature:
+It stores the latest value and immediately gives that latest value to a new subscriber.
+
+Compare Subject and BehaviorSubject
+This is worth putting in your notes.
+
+Feature	Subject	BehaviorSubject
+Requires initial value	No	Yes
+Sends values to current subscribers	Yes	Yes
+Stores latest value	No	Yes
+New subscriber immediately receives latest value	No	Yes
+
+ReplaySubject
+A ReplaySubject is a Subject which can remember a specified number of previous emissions and replay them to a new subscriber.
+BehaviorSubject:
+
+new BehaviorSubject(0)
+
+requires an initial value.
+
+ReplaySubject:
+
+new ReplaySubject<number>(2)
+
+does not require an initial value.
+
+Why?
+
+Because a ReplaySubject doesn't promise:
+
+"I always have a current value."
+
+Instead, it promises:
+
+"I'll replay whatever values I have buffered."
+What is the difference between Subject, BehaviorSubject, and ReplaySubject?
+
+A concise answer:
+
+Subject
+→ No initial value
+→ Doesn't replay past values
+
+BehaviorSubject
+→ Requires initial value
+→ Stores latest value
+→ New subscribers immediately get latest value
+
+ReplaySubject
+→ Doesn't require initial value
+→ Stores multiple previous values
+→ New subscribers receive buffered values
+
+AsyncSubject
+it emits only the last value, and only when the Subject completes. Even if its subscribed to after completion, it will emit the last value before completion
