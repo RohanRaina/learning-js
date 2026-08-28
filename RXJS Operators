@@ -1,0 +1,236 @@
+RxjsOperators
+An operator allows us to process the values emitted by Observables.Operators generally create a new Observable rather than modifying the original one.
+*Map()
+map() transforms each emitted value into another value.
+const numbers$ = of(1, 2, 3);
+const doubled$ = numbers$.pipe(
+  map(x => x * 2)
+);
+
+*filter() 
+filter() allows values that satisfy a condition and ignores values that don't.
+
+const numbers$ = of(1, 2, 3, 4, 5);
+
+const result$ = numbers$.pipe(
+  filter(x => x % 2 === 0)
+);
+
+*tap()
+tap() is used to perform a side effect without changing the emitted value.
+tap() observes the value but doesn't transform it.
+
+That's why it is commonly used for:
+
+logging
+debugging
+metrics
+triggering some side effect
+But not for transforming the stream.
+
+*scan()
+scan() maintains an accumulator and emits the accumulated result after each source emission.
+of(1, 2, 3).pipe(
+  scan((acc, value) => acc + value, 0)
+)
+
+*take()
+take() is a filtering-style operator that limits how many values we receive.
+take(n) emits the first n values from the source Observable and then completes the resulting Observable.
+
+*takeUntill()
+takeUntil(notifier$) keeps emitting source values until the notifier Observable emits. Then the resulting Observable completes.
+source$.pipe(
+  takeUntil(stop$)
+)
+The source emits until stop$ emits something.
+
+take() vs takeUntil()
+Very important:
+
+take(3)
+→ stop after 3 values
+
+
+takeUntil(stop$)
+→ stop when stop$ emits
+
+So:
+
+take()
+→ count-based stopping
+
+takeUntil()
+→ signal-based stopping
+
+*distinctUntilChanged()
+Its job is to prevent consecutive duplicate values.
+distinctUntilChanged() removes consecutive duplicate values, not all duplicates.
+
+*debounceTime()
+debounceTime(duration) waits for a period of silence before emitting the latest value. Every new value resets the timer.
+source$.pipe(
+  debounceTime(500)
+)
+Means:
+Wait for 500ms of silence before emitting the latest value.
+
+*throttleTime()
+throttleTime(duration) limits how frequently values are emitted. After a value is emitted, subsequent values are suppressed during the throttle period.
+
+
+Higher Order Observables
+
+Observable that emits another Observable are called Higher Order Observables
+We don't usually want the subscriber to receive Observable objects.So flattening is required before theobservable is  subscribed
+RxJS provide  following  flattening  operators
+
+*switchMap()
+switchMap() unsubscribes from the previous inner Observable when a new outer value arrives.
+Why is switchMap() useful?
+The classic example is search/autocomplete.
+
+Imagine the user types:
+
+a
+an
+ang
+angu
+angul
+angula
+angular
+
+Each input could trigger an HTTP request.
+
+We don't necessarily care about the results for old searches.
+
+If the user has now typed:
+
+angular
+
+we primarily want the result for the latest search.
+
+So:
+
+searchControl.valueChanges.pipe(
+  debounceTime(300),
+  switchMap(term => searchApi(term))
+)
+
+Conceptually:
+
+"ang"
+ ↓
+request A ─────────X
+
+"angu"
+ ↓
+request B ─────────X
+
+"angular"
+ ↓
+request C ───────────────→ result
+
+The previous inner subscriptions are cancelled when newer searches arrive.
+
+*mergeMap()
+mergeMap() subscribes to each inner Observable and allows them to run concurrently.
+Nothing gets cancelled simply because a new outer value arrived.
+
+For example:
+
+Inner A: A1 → A2 → A3
+Inner B: B1 → B2 → B3
+
+The resulting Observable might emit:
+
+A1
+B1
+A2
+B2
+A3
+B3
+
+The exact order depends on the timing of the inner Observables.
+
+*concatMap()
+concatMap() processes inner Observables one at a time, in order.
+Unlike mergeMap(), it doesn't run them concurrently.
+
+mergeMap() vs concatMap() ⭐
+Very important:
+
+mergeMap()
+A starts
+B starts
+C starts
+
+→ concurrent
+
+concatMap()
+A starts
+B waits
+C waits
+
+A completes
+ ↓
+B starts
+
+B completes
+ ↓
+C starts
+
+→ sequential
+
+So put this in your notes:
+
+mergeMap()
+→ concurrent
+
+concatMap()
+→ sequential + ordered
+
+exhaustMap()
+exhaustMap() ignores new outer values while the current inner Observable is running.
+Real-world example ⭐
+A classic use case is a Submit button.
+
+Imagine the user clicks:
+
+Submit
+Submit
+Submit
+
+The first click starts an HTTP request:
+
+Submit
+  ↓
+HTTP request
+  ↓
+running...
+
+If the user clicks again while that request is still running:
+
+Submit → IGNORE
+Submit → IGNORE
+
+You don't necessarily want three identical requests.
+
+So:
+
+submitClicks$.pipe(
+  exhaustMap(() => saveData$())
+)
+
+means:
+
+"Start the first save. Ignore additional clicks until that save finishes."
+mergeMap(value => inner$(value), 2)
+
+only 2 at a time.
+
+Notes ✍️
+mergeMap() supports a concurrency limit. When the limit is reached, additional inner Observables wait until an active inner Observable completes.
+
+
+
