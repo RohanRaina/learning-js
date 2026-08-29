@@ -232,5 +232,246 @@ only 2 at a time.
 Notes ✍️
 mergeMap() supports a concurrency limit. When the limit is reached, additional inner Observables wait until an active inner Observable completes.
 
+Error  Handling  Operators
+
+*catchError()
+catchError() catches an error from an Observable and replaces the failed stream with another Observable.
+catchError() can either:
+recover with a replacement Observable
+rethrow the error after doing something with it
+
+*throwError()
+throwError() is a creation function that creates an Observable which immediately sends an error notification.
+Why would we use it?
+A common use is inside catchError() when we want to rethrow the error.
+
+source$.pipe(
+  catchError(error => {
+    console.log('Logging:', error);
+
+    return throwError(() => error);
+  })
+)
+
+Flow:
+
+source
+  ↓
+error
+  ↓
+catchError
+  ↓
+log error
+  ↓
+throwError
+  ↓
+error reaches subscriber
+
+*finalize()
+finalize() executes a callback when the Observable terminates or the subscription is unsubscribed.
+finalize()
+→ runs on complete
+→ runs on error
+→ runs on unsubscribe
+→ commonly used for cleanup/loading state
+
+*retyr()
+This is used when an Observable fails and we want to subscribe to the source again.
+apiCall$.pipe(
+  retry(2),
+  catchError(() => of('Fallback'))
+)
+Suppose the API fails every time.
+
+Attempt 1 → error
+     ↓
+Attempt 2 → error
+     ↓
+Attempt 3 → error
+     ↓
+catchError()
+     ↓
+"Fallback"
+     ↓
+complete
+
+Notice the order:
+
+retry()
+  ↓
+catchError()
+
+retry() gets the opportunity to retry first.
+
+Only after the retries are exhausted does the error reach catchError().
+
+But placement matters ⭐
+Consider:
+
+source$.pipe(
+  catchError(() => of('Fallback')),
+  retry(2)
+)
+
+Now catchError() handles the error before retry() sees it.
+
+It replaces the error with:
+
+of('Fallback')
+
+That replacement Observable completes normally.
+
+Therefore, there may be nothing for retry() to retry.
+
+*startWith()
+allows you to specify values that should be emitted before the source Observable starts emitting its own values.
+of(3).pipe(
+  startWith(1, 2)
+)
+
+Output:
+
+1
+2
+3
+complete
+
+*endWith()
+It appends values after the source completes normally.
+of(10, 20).pipe(
+  endWith(30, 40)
+)
+
+Output:
+
+10
+20
+30
+40
+complete
+
+The source must finish before 30 and 40 are emitted.
+
+In case of errors or if we unsubscribe endsWith() will not be callled
+
+*defaultIfEmpty() 
+emits a default value if the source completes without emitting anything.
+
+*first()
+It emits the first value and then completes.If no matching value exists and no default is supplied, it errors when the source completes.
+
+Example:
+
+of(10, 20, 30).pipe(
+  first()
+)
+
+Output:
+
+10
+complete
+
+It doesn't wait for 20 or 30.
+This is similar to:
+
+take(1)
+
+because:
+
+source$.pipe(
+  take(1)
+)
+
+also takes the first value and completes.
+
+So why have first()?
+first() has some additional behavior.
+
+You can provide a predicate.
+
+For example:
+
+of(10, 20, 30, 40).pipe(
+  first(x => x > 20)
+)
+
+It looks for the first value satisfying the condition.
+
+Check each value:
+
+10 → x > 20? ❌
+
+20 → x > 20? ❌
+30 → x > 20? ✅
+
+Therefore:
+
+30
+complete
+
+*last()
+last() waits for the source to complete and then emits the last value
+
+*find()
+find() emits the first value that satisfies the predicate.find() is similar to first() with a predicate,
+but there is an important difference in what it returns.
+What happens when nothing matches?
+
+With find():
+
+of(10, 20).pipe(
+  find(x => x > 100)
+)
+
+There is no match.
+
+find() emits:
+
+undefined
+complete
+
+It does not throw an error.
+
+Compare:
+
+first(predicate)
+→ no match → ERROR ❌
+
+find(predicate)
+→ no match → undefined
+
+*findIndex()
+similar to find(), but instead of returning the matching value, it returns the matching index.
+
+No value matches.
+
+findIndex() emits:
+
+-1
+complete
+
+---CombinationOperators---
+
+*combineLatest()
+combineLatest() combines multiple Observables and emits whenever any one of them emits, using the latest value from every Observable.
+Important rule ⭐
+combineLatest() doesn't emit until every source has emitted at least once.
+
+*withLatestFrom()
+withLatestFrom() combines the latest value from one or more other Observables with the value emitted by the source Observable.
+combineLatest() vs withLatestFrom() ⭐
+combineLatest()	withLatestFrom()
+Any Observable can trigger emission	Only source Observable triggers emission
+Emits latest values from all sources	Emits source value + latest other values
+Useful when any change matters	Useful when a specific event triggers the calculation
+
+*zip()
+zip() combines multiple Observables by pairing their values according to their emission order. It waits until each Observable has emitted the corresponding value and then emits those values together.
+
+
+
+
+
+
 
 
